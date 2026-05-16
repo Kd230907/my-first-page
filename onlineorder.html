@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Order | Bean & Bloom Café</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8c6e4e;
+            --primary-dark: #6b4f36;
+            --accent: #b39977;
+            --light: #f6eee3;
+            --lighter: #fffaf3;
+            --white: #ffffff;
+            --text: #333333;
+            --success: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--lighter);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        nav .logo {
+            font-family: 'Pacifico', cursive;
+            font-size: 28px;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        nav ul li {
+            display: inline-block;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 500;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: var(--white);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Page Header */
+        .page-header {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Order Container */
+        .order-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            gap: 30px;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            flex: 2;
+        }
+
+        .category-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .category-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .category-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-item {
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .item-details {
+            padding: 20px;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+        }
+
+        .item-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            min-height: 40px;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .add-to-cart {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Cart Section */
+        .cart-section {
+            flex: 1;
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .cart-section h2 {
+            font-family: 'Pacifico', cursive;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-info p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background-color: var(--light);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .quantity {
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .cart-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--light);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-dark);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--light);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .checkout-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 30px 0;
+            color: #888;
+        }
+
+        .empty-cart i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-family: 'Pacifico', cursive;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #f0e6d6;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .social-icons a:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .order-container {
+                flex-direction: column;
+            }
+            
+            .cart-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+            
+            .menu-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 36px;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Bean & Bloom Café</div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#menu">Menu</a></li>
+            <li><a href="order.html" style="background-color: var(--white); color: var(--primary);">Order Online</a></li>
+            <li><a href="index.html#contact">Location</a></li>
+            <li class="cart-icon">
+                <a href="#"><i class="fas fa-shopping-cart"></i></a>
+                <span class="cart-count">0</span>
+            </li>
+            <li><a href="login.html">Sign In</a></li>
+        </ul>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Online Order</h1>
+        <p>Order your favorite coffee and treats for pickup or delivery</p>
+    </div>
+
+    <!-- Order Container -->
+    <div class="order-container">
+        <!-- Menu Section -->
+        <div class="menu-section">
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="coffee">Coffee & Beverages</button>
+                <button class="category-tab" data-category="snacks">Snacks & Sides</button>
+                <button class="category-tab" data-category="desserts">Desserts</button>
+            </div>
+
+            <div class="menu-items">
+                <!-- Coffee Items -->
+                <div class="menu-item" data-category="coffee">
+                    <img src="https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1744&q=80" alt="Espresso" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Espresso</h3>
+                        <p class="item-description">Strong and rich single shot of espresso</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹120</span>
+                            <button class="add-to-cart" data-id="1" data-name="Espresso" data-price="120">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-category="coffee">
+                    <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1734&q=80" alt="Cappuccino" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Cappuccino</h3>
+                        <p class="item-description">Perfect blend of espresso, steamed milk and foam</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹160</span>
+                            <button class="add-to-cart" data-id="2" data-name="Cappuccino" data-price="160">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-category="coffee">
+                    <img src="https://images.unsplash.com/photo-1560769684-55015cee73a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Caramel Frappe" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Caramel Frappe</h3>
+                        <p class="item-description">Iced blended coffee with caramel and whipped cream</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹200</span>
+                            <button class="add-to-cart" data-id="3" data-name="Caramel Frappe" data-price="200">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snack Items -->
+                <div class="menu-item" data-category="snacks">
+                    <img src="https://images.unsplash.com/photo-1551782450-17144efb9c50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80" alt="Veg Sandwich" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Veg Sandwich</h3>
+                        <p class="item-description">Fresh vegetables with our special sauce on multigrain bread</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹120</span>
+                            <button class="add-to-cart" data-id="4" data-name="Veg Sandwich" data-price="120">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-category="snacks">
+                    <img src="https://images.unsplash.com/photo-1526234362653-3b75a0c07438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="French Fries" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">French Fries</h3>
+                        <p class="item-description">Crispy golden fries with a pinch of salt</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹100</span>
+                            <button class="add-to-cart" data-id="5" data-name="French Fries" data-price="100">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dessert Items -->
+                <div class="menu-item" data-category="desserts">
+                    <img src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1546&q=80" alt="Choco Lava Cake" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Choco Lava Cake</h3>
+                        <p class="item-description">Warm chocolate cake with a molten chocolate center</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹150</span>
+                            <button class="add-to-cart" data-id="6" data-name="Choco Lava Cake" data-price="150">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item" data-category="desserts">
+                    <img src="https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1734&q=80" alt="Blueberry Cheesecake" class="item-image">
+                    <div class="item-details">
+                        <h3 class="item-name">Blueberry Cheesecake</h3>
+                        <p class="item-description">Creamy cheesecake with blueberry compote topping</p>
+                        <div class="item-footer">
+                            <span class="item-price">₹200</span>
+                            <button class="add-to-cart" data-id="7" data-name="Blueberry Cheesecake" data-price="200">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="cart-section">
+            <h2>Your Order</h2>
+            <div class="cart-items">
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <p>Add some delicious items!</p>
+                </div>
+                <!-- Cart items will be dynamically added here -->
+            </div>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span class="subtotal">₹0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax (5%):</span>
+                    <span class="tax">₹0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span class="total-amount">₹0</span>
+                </div>
+                <button class="checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast">Item added to cart!</div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Bean & Bloom Café</h3>
+                <p>Freshly roasted coffee, artisanal baked goods, and a cozy atmosphere in the heart of Junagadh.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="index.html#about">About Us</a>
+                <a href="index.html#menu">Menu</a>
+                <a href="order.html">Order Online</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Near Noble College, Junagadh</p>
+                <p><i class="fas fa-phone"></i> +91 92743 25600</p>
+                <p><i class="fas fa-envelope"></i> beanbloomcafe@gmail.com</p>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 Bean & Bloom Café | Freshly Roasted Happiness
+        </div>
+    </footer>
+
+    <script>
+        // Cart functionality
+        let cart = [];
+        const cartCount = document.querySelector('.cart-count');
+        const cartItems = document.querySelector('.cart-items');
+        const subtotalEl = document.querySelector('.subtotal');
+        const taxEl = document.querySelector('.tax');
+        const totalEl = document.querySelector('.total-amount');
+        const checkoutBtn = document.querySelector('.checkout-btn');
+        const toast = document.querySelector('.toast');
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const name = this.dataset.name;
+                const price = parseInt(this.dataset.price);
+                
+                // Check if item already in cart
+                const existingItem = cart.find(item => item.id === id);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id,
+                        name,
+                        price,
+                        quantity: 1
+                    });
+                }
+                
+                updateCart();
+                showToast(`${name} added to cart!`);
+            });
+        });
+
+        // Update cart display
+        function updateCart() {
+            // Update cart count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Your cart is empty</p>
+                        <p>Add some delicious items!</p>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = '';
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    const cartItemEl = document.createElement('div');
+                    cartItemEl.className = 'cart-item';
+                    cartItemEl.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>₹${item.price}</p>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItemEl);
+                });
+                
+                // Add event listeners to quantity buttons
+                document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        const item = cart.find(item => item.id === id);
+                        if (item.quantity > 1) {
+                            item.quantity -= 1;
+                        } else {
+                            cart = cart.filter(item => item.id !== id);
+                        }
+                        updateCart();
+                    });
+                });
+                
+                document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        const item = cart.find(item => item.id === id);
+                        item.quantity += 1;
+                        updateCart();
+                    });
+                });
+            }
+            
+            // Update totals
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = Math.round(subtotal * 0.05);
+            const total = subtotal + tax;
+            
+            subtotalEl.textContent = `₹${subtotal}`;
+            taxEl.textContent = `₹${tax}`;
+            totalEl.textContent = `₹${total}`;
+        }
+
+        // Category tabs functionality
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Update active tab
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter items
+                const category = this.dataset.category;
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    if (category === 'all' || item.dataset.category === category) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Checkout button
+        checkoutBtn.addEventListener('click', function() {
+            if (cart.length === 0) {
+                showToast('Your cart is empty!');
+            } else {
+                // In a real app, this would redirect to checkout page
+                showToast('Proceeding to checkout...');
+                // Simulate checkout process
+                setTimeout(() => {
+                    alert('Order placed successfully! Thank you for your order.');
+                    cart = [];
+                    updateCart();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
